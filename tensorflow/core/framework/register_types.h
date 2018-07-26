@@ -186,7 +186,7 @@ limitations under the License.
 
 // Call "m" on all number types supported on GPU.
 #define TF_CALL_GPU_NUMBER_TYPES(m) \
-  TF_CALL_half(m) TF_CALL_float(m) TF_CALL_double(m)
+  TF_CALL_half(m) TF_CALL_float(m) TF_CALL_double(m) TF_CALL_int32(m) TF_CALL_int64(m)
 
 // Call "m" on all types supported on GPU.
 #define TF_CALL_GPU_ALL_TYPES(m) \
