@@ -993,11 +993,19 @@ def _TopKGrad(op, grad, _):
   # finally reshaping it to the original input shape.
   return [
       array_ops.reshape(
-          sparse_ops.sparse_to_dense(
-              ind,
-              array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
-              array_ops.reshape(grad, [-1]),
-              validate_indices=False), in_shape),
+          # sparse_to_dense only runs on CPU, use scatter_nd for better performance
+          # on GPU
+          # sparse_ops.sparse_to_dense(
+          #     ind,
+          #     array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
+          #     array_ops.reshape(grad, [-1]),
+          #     validate_indices=False), 
+          array_ops.scatter_nd(
+            ind,
+            array_ops.reshape(grad, [-1]),
+            array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
+          ),
+          in_shape),
       array_ops.zeros([], dtype=dtypes.int32)
   ]
 
