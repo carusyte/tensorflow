@@ -979,15 +979,18 @@ def _TopKGrad(op, grad, _):
   in_shape = array_ops.shape(op.inputs[0])
   ind_shape = array_ops.shape(op.outputs[1])
 
-  ind_lastdim = array_ops.gather(ind_shape, array_ops.size(ind_shape) - 1)
+  # int32 is not supported on GPU hence up-casting
+  ind_lastdim = array_ops.gather(math_ops.cast(
+      ind_shape, dtypes.int64), array_ops.size(ind_shape) - 1)
   # Flatten indices to 2D.
   ind_2d = array_ops.reshape(op.outputs[1], array_ops.stack([-1, ind_lastdim]))
 
-  in_lastdim = array_ops.gather(in_shape, array_ops.size(in_shape) - 1)
+  in_lastdim = array_ops.gather(math_ops.cast(
+      in_shape, dtypes.int64), array_ops.size(in_shape) - 1)
   outerdim = array_ops.shape(ind_2d)[0]
   # Compute linear indices (flattened to 1D).
   ind = array_ops.reshape(ind_2d + array_ops.expand_dims(
-      math_ops.range(0, outerdim * in_lastdim, in_lastdim), -1), [-1])
+      math_ops.range(0, math_ops.cast(outerdim, dtypes.int64) * in_lastdim, in_lastdim), -1), [-1])
 
   # Substitute grad to appropriate locations and fill the rest with zeros,
   # finally reshaping it to the original input shape.
@@ -1001,9 +1004,9 @@ def _TopKGrad(op, grad, _):
           #     array_ops.reshape(grad, [-1]),
           #     validate_indices=False), 
           array_ops.scatter_nd(
-            ind,
-            array_ops.reshape(grad, [-1]),
-            array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
+              ind,
+              array_ops.reshape(grad, [-1]),
+              array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
           ),
           in_shape),
       array_ops.zeros([], dtype=dtypes.int32)
