@@ -989,8 +989,8 @@ def _TopKGrad(op, grad, _):
       in_shape, dtypes.int64), array_ops.size(in_shape) - 1)
   outerdim = array_ops.shape(ind_2d)[0]
   # Compute linear indices (flattened to 1D).
-  ind = array_ops.reshape(ind_2d + array_ops.expand_dims(
-      math_ops.range(0, math_ops.cast(outerdim, dtypes.int64) * in_lastdim, in_lastdim), -1), [-1])
+  ind = array_ops.reshape(ind_2d + math_ops.cast(array_ops.expand_dims(
+      math_ops.range(0, math_ops.cast(outerdim, dtypes.int64) * in_lastdim, in_lastdim), -1), dtypes.int32), [-1])
 
   # Substitute grad to appropriate locations and fill the rest with zeros,
   # finally reshaping it to the original input shape.
