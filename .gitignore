@@ -35,3 +35,6 @@ xcuserdata/**
 *.iml
 local.properties
 gradleBuild
+
+.history/*
+.gitignore
