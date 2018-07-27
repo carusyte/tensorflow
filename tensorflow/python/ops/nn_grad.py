@@ -1004,9 +1004,9 @@ def _TopKGrad(op, grad, _):
           #     array_ops.reshape(grad, [-1]),
           #     validate_indices=False), 
           array_ops.scatter_nd(
-              ind,
+              array_ops.expand_dims(ind, -1),
               array_ops.reshape(grad, [-1]),
-              array_ops.reshape(math_ops.reduce_prod(in_shape), [1]),
+              array_ops.reshape(math_ops.reduce_prod(in_shape), [1])
           ),
           in_shape),
       array_ops.zeros([], dtype=dtypes.int32)
